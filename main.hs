@@ -2,17 +2,21 @@ import Data.List
 type Nomial = (Int, [(Char, Int)])
 type Polynomial = [Nomial]
 
+--[(0, [('x', 2)]), (2, [('y', 1)]), (5, [('z', 1)]), (1, [('y', 1)]), (7, [('y', 2)])]
+--[(7, [('y', 2)]), (3, [('y', 1)]), (5, [('z', 1)])]
+
 -- ======================================================
 --                  Main Functions
 -- ======================================================
-
 
 add :: Polynomial -> Polynomial -> Polynomial
 add [a] b = addAux a b
 add (a:as) b = addAux a (add as b) 
 
 normalize:: Polynomial -> Polynomial
-normalize a = add (pssort (map nssort (remove0coeficients (map remove0exponents a)))) []
+normalize a = reverse (myisort (assort (add (map nssort ( remove0coeficients (map remove0exponents a))) [])))
+
+-- need to sort alphabeticaly
 
 -- ======================================================
 --                  Aux Functions
@@ -28,15 +32,25 @@ addAux a (b:bs) = if snd a == snd b then addNomial a b : bs
                 else b: addAux a bs
 
 -- normalize
-    -- polynomial sort
-pMin :: Polynomial -> Nomial
-pMin [x] = x
-pMin (x:xs) = if snd x <= snd (pMin xs) then x else pMin xs
+    -- polynomial alphabetical sort
+aMin :: Polynomial -> Nomial
+aMin [x] = x
+aMin (x:xs) = if fst (head (snd x)) <= fst (head(snd (aMin xs))) then x else aMin xs
 
-pssort:: Polynomial -> Polynomial
-pssort [] = []
-pssort a = m : pssort (Data.List.delete m a)
-    where m = pMin a
+assort:: Polynomial -> Polynomial
+assort [] = []
+assort a = m : assort (Data.List.delete m a)
+    where m = aMin a
+
+    --polynomial exponent sort
+myinsert :: Nomial -> Polynomial -> Polynomial
+myinsert a [] = [a]
+myinsert a (x: xs) = if snd (head (snd x)) > snd (head (snd a)) then a : x : xs else
+    x : myinsert a xs
+
+myisort :: Polynomial -> Polynomial
+myisort = foldr myinsert []
+
 
     -- monomial sort
 nssort :: Nomial -> Nomial
