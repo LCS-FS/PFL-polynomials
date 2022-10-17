@@ -22,7 +22,8 @@ normalize a = reverse (myisort (assort (add (map nssort ( remove0coeficients (ma
 --                  Aux Functions
 -- ======================================================
 
--- add
+-- ======================= add ==========================
+
 addNomial:: Nomial -> Nomial -> Nomial
 addNomial a b = (fst a + fst b, snd a)
 
@@ -31,7 +32,8 @@ addAux a [] = [a]
 addAux a (b:bs) = if snd a == snd b then addNomial a b : bs
                 else b: addAux a bs
 
--- normalize
+-- ==================== Normalize =======================
+
     -- polynomial alphabetical sort
 aMin :: Polynomial -> Nomial
 aMin [x] = x
@@ -50,7 +52,6 @@ myinsert a (x: xs) = if snd (head (snd x)) > snd (head (snd a)) then a : x : xs 
 
 myisort :: Polynomial -> Polynomial
 myisort = foldr myinsert []
-
 
     -- monomial sort
 nssort :: Nomial -> Nomial
