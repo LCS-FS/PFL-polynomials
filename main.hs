@@ -1,4 +1,6 @@
 import Data.List
+import Data.String
+
 type Nomial = (Int, [(Char, Int)])
 type Polynomial = [Nomial]
 
@@ -14,7 +16,7 @@ add [a] b = addAux a b
 add (a:as) b = normalize( addAux a (add as b) ) 
 
 normalize:: Polynomial -> Polynomial
-normalize a = reverse (myisort (assort (add (map nssort ( remove0coeficients (map remove0exponents a))) [])))
+normalize a = reverse (myisort (assort (add (map nssort ( remove0coeficients (map remove0exponents a))) []))) --[(2,[('x',1)]),(3,[('y',2)])] está a fazer ciclo infinito
 
 -- need to sort alphabeticaly
 
@@ -31,6 +33,16 @@ addAux:: Nomial -> Polynomial -> Polynomial
 addAux a [] = [a]
 addAux a (b:bs) = if snd a == snd b then addNomial a b : bs
                 else b: addAux a bs
+
+--multiply nomials
+--multiplyNomial:: Nomial -> Nomial -> Int
+--multiplyNomial a b = (fst a * fst b, if(fst(head(snd a)) == fst(head(snd b))) then (snd(head(snd a) + snd(head(snd b)))) else "tenho de acabar isto")
+                                              --multiplicamos sempre o coeficiente e depois
+                                              --temos de ver se char for igual -> somar ints e manter o char
+                                              -- se char for diferente -> juntar chars (por ordem alfabetica)
+                                              -- fazer isso para a lista toda (é a parte mais tricky eu acho)
+
+
 
 -- ==================== Normalize =======================
 
