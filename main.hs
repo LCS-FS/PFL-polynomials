@@ -11,7 +11,7 @@ type Polynomial = [Nomial]
 
 add :: Polynomial -> Polynomial -> Polynomial
 add [a] b = addAux a b
-add (a:as) b = addAux a (add as b) 
+add (a:as) b = normalize( addAux a (add as b) ) 
 
 normalize:: Polynomial -> Polynomial
 normalize a = reverse (myisort (assort (add (map nssort ( remove0coeficients (map remove0exponents a))) [])))
