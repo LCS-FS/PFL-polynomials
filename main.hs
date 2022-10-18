@@ -1,6 +1,5 @@
 import Data.List
 import Data.String
-import Distribution.Compat.CharParsing (Parsing)
 
 type Nomial = (Int, [(Char, Int)])
 type Polynomial = [Nomial]
@@ -9,20 +8,26 @@ type Polynomial = [Nomial]
 --[(0, [('x', 2)]), (2, [('y', 1)]), (5, [('z', 1)]), (1, [('y', 1)]), (7, [('y', 2)])]
 --[(7, [('y', 2)]), (3, [('y', 1)]), (5, [('z', 1)])]
 
+--Example broken:
+--derivated do exemplo normalizado
+
+
 -- ======================================================
 --                    String Parsing
 -- ===================================================
-
+-- TO DO --
 
 -- ======================================================
 --                  Main Functions
 -- ======================================================
 
-add :: Polynomial -> Polynomial -> Polynomial
+add:: Polynomial -> Polynomial -> Polynomial
+--add a b = normalize (addBeforaNormalize a b)
 add [a] b = addAux a b
 add (a:as) b = addAux a (add as b)
 
 normalize:: Polynomial -> Polynomial
+--normalize a = reverse (myisort (assort (addBeforaNormalize (map (nisort . nssort) ( remove0coeficients (map remove0exponents a))) [] ))) --not working
 normalize a = reverse (myisort (assort (add (map nssort ( remove0coeficients (map remove0exponents a))) [])))
 
 derivate:: Polynomial -> Polynomial
@@ -36,9 +41,15 @@ derivate = map derivateNomial
 
 -- ======================= add ==========================
 
+addBeforaNormalize :: Polynomial -> Polynomial -> Polynomial
+addBeforaNormalize a [] = a
+addBeforaNormalize [] a = a
+addBeforaNormalize [a] b = addAux a b
+addBeforaNormalize (a:as) b = addAux a (addBeforaNormalize as b)
+
 derivateNomial:: Nomial -> Nomial --derivar com apenas uma variavel (para fazer com varias variaveis tinhamos de perguntar em ordem a x,y,z...)  
-derivateNomial (_, []) = (0,[]);                                         --snd(head(snd (7, [('y', 2)]))) -> 2
-derivateNomial (coef,[(v,ex)]) = (coef * ex,[(v,ex-1)])                  -- coeficiente * expoente e depois expoente -1
+derivateNomial (_, []) = (0,[]);
+derivateNomial (coef,[(v,ex)]) = (coef * ex,[(v,ex-1)])
 derivateNomial (_,_) = error "multiple variables"
 
 addNomial:: Nomial -> Nomial -> Nomial
@@ -56,7 +67,7 @@ addAux a (b:bs) = if snd a == snd b then addNomial a b : bs
                                               --temos de ver se char for igual -> somar ints e manter o char
                                               -- se char for diferente -> juntar chars (por ordem alfabetica)
                                               -- fazer isso para a lista toda (é a parte mais tricky eu acho)
-
+                                              --snd(head(snd (7, [('y', 2)]))) -> 2
 
 
 -- ==================== Normalize =======================
@@ -82,7 +93,7 @@ myisort = foldr myinsert []
 
     -- monomial sort
 nssort :: Nomial -> Nomial
-nssort (a, x) = (a, Data.List.reverse (myssort x))
+nssort (a, x) = (a, myssort x)
 
 myssort:: [(Char, Int)] -> [(Char, Int)]
 myssort [] = []
@@ -91,7 +102,15 @@ myssort a = m : myssort (Data.List.delete m a)
 
 nMin :: [(Char, Int)] -> (Char, Int)
 nMin [x] = x
-nMin (x:xs) = if snd x <= snd (nMin xs) then x else nMin xs
+nMin (x:xs) = if fst x <= fst (nMin xs) then x else nMin xs
+
+ninsert:: (Char, Int) -> [(Char, Int)] -> [(Char, Int)]
+ninsert a [] = [a]
+ninsert a (x:xs) = if snd x > snd a then a : x : xs else
+    x: ninsert a xs
+
+nisort:: Nomial -> Nomial
+nisort (a, b) = (a, reverse (foldr ninsert [] b))
 
     -- remove 0x^1
 remove0coeficients:: Polynomial -> Polynomial
