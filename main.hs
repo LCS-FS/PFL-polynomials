@@ -1,11 +1,18 @@
 import Data.List
 import Data.String
+import Distribution.Compat.CharParsing (Parsing)
 
 type Nomial = (Int, [(Char, Int)])
 type Polynomial = [Nomial]
 
+--Example:
 --[(0, [('x', 2)]), (2, [('y', 1)]), (5, [('z', 1)]), (1, [('y', 1)]), (7, [('y', 2)])]
 --[(7, [('y', 2)]), (3, [('y', 1)]), (5, [('z', 1)])]
+
+-- ======================================================
+--                    String Parsing
+-- ===================================================
+
 
 -- ======================================================
 --                  Main Functions
@@ -13,10 +20,13 @@ type Polynomial = [Nomial]
 
 add :: Polynomial -> Polynomial -> Polynomial
 add [a] b = addAux a b
-add (a:as) b = addAux a (add as b) 
+add (a:as) b = addAux a (add as b)
 
 normalize:: Polynomial -> Polynomial
 normalize a = reverse (myisort (assort (add (map nssort ( remove0coeficients (map remove0exponents a))) [])))
+
+derivate:: Polynomial -> Polynomial
+derivate = map derivateNomial
 
 -- need to sort alphabeticaly
 
@@ -26,17 +36,22 @@ normalize a = reverse (myisort (assort (add (map nssort ( remove0coeficients (ma
 
 -- ======================= add ==========================
 
+derivateNomial:: Nomial -> Nomial --derivar com apenas uma variavel (para fazer com varias variaveis tinhamos de perguntar em ordem a x,y,z...)  
+derivateNomial (_, []) = (0,[]);                                         --snd(head(snd (7, [('y', 2)]))) -> 2
+derivateNomial (coef,[(v,ex)]) = (coef * ex,[(v,ex-1)])                  -- coeficiente * expoente e depois expoente -1
+derivateNomial (_,_) = error "multiple variables"
+
 addNomial:: Nomial -> Nomial -> Nomial
 addNomial a b = (fst a + fst b, snd a)
 
 addAux:: Nomial -> Polynomial -> Polynomial
 addAux a [] = [a]
 addAux a (b:bs) = if snd a == snd b then addNomial a b : bs
-                else b: addAux a bs
+                  else b: addAux a bs
 
 --multiply nomials
 --multiplyNomial:: Nomial -> Nomial -> Int
---multiplyNomial a b = (fst a * fst b, if(fst(head(snd a)) == fst(head(snd b))) then (snd(head(snd a) + snd(head(snd b)))) else "tenho de acabar isto")
+--multiplyNomial a b = (fst a * fst b, if(fst(head(fst a)) == fst(head(fst b))) then (snd(head(snd a) + snd(head(snd b)))) else "tenho de acabar isto")
                                               --multiplicamos sempre o coeficiente e depois
                                               --temos de ver se char for igual -> somar ints e manter o char
                                               -- se char for diferente -> juntar chars (por ordem alfabetica)
@@ -74,7 +89,7 @@ myssort [] = []
 myssort a = m : myssort (Data.List.delete m a)
     where m = nMin a
 
-nMin :: [(Char, Int)] -> (Char, Int) 
+nMin :: [(Char, Int)] -> (Char, Int)
 nMin [x] = x
 nMin (x:xs) = if snd x <= snd (nMin xs) then x else nMin xs
 
@@ -82,7 +97,7 @@ nMin (x:xs) = if snd x <= snd (nMin xs) then x else nMin xs
 remove0coeficients:: Polynomial -> Polynomial
 remove0coeficients [] = []
 remove0coeficients (x:xs) = if fst x == 0 then remove0coeficients xs
-                            else x : remove0coeficients xs 
+                            else x : remove0coeficients xs
     --change 2x^0 to 2
 remove0exponents:: Nomial -> Nomial
 remove0exponents (a, x) = (a, remove0exponentsAux x)
