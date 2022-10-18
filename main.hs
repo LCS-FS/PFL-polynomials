@@ -11,12 +11,11 @@ type Polynomial = [Nomial]
 --                  Main Functions
 -- ======================================================
 
-add :: Polynomial -> Polynomial -> Polynomial
-add [a] b = addAux a b
-add (a:as) b = addAux a (add as b) 
+add:: Polynomial -> Polynomial -> Polynomial
+add a b = normalize (addBeforaNormalize a b)
 
 normalize:: Polynomial -> Polynomial
-normalize a = reverse (myisort (assort (add (map nssort ( remove0coeficients (map remove0exponents a))) [])))
+normalize a = reverse (myisort (assort (addBeforaNormalize (map nssort ( remove0coeficients (map remove0exponents a))) [])))
 
 -- need to sort alphabeticaly
 
@@ -25,6 +24,10 @@ normalize a = reverse (myisort (assort (add (map nssort ( remove0coeficients (ma
 -- ======================================================
 
 -- ======================= add ==========================
+
+addBeforaNormalize :: Polynomial -> Polynomial -> Polynomial
+addBeforaNormalize [a] b = addAux a b
+addBeforaNormalize (a:as) b = addAux a (addBeforaNormalize as b) 
 
 addNomial:: Nomial -> Nomial -> Nomial
 addNomial a b = (fst a + fst b, snd a)
