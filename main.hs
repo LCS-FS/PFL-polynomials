@@ -15,7 +15,7 @@ add:: Polynomial -> Polynomial -> Polynomial
 add a b = normalize (addBeforaNormalize a b)
 
 normalize:: Polynomial -> Polynomial
-normalize a = reverse (myisort (assort (addBeforaNormalize (map nssort ( remove0coeficients (map remove0exponents a))) [])))
+normalize a = reverse (myisort (assort (addBeforaNormalize (map nisort (map nssort ( remove0coeficients (map remove0exponents a)))) [] )))
 
 -- need to sort alphabeticaly
 
@@ -70,7 +70,7 @@ myisort = foldr myinsert []
 
     -- monomial sort
 nssort :: Nomial -> Nomial
-nssort (a, x) = (a, Data.List.reverse (myssort x))
+nssort (a, x) = (a, myssort x)
 
 myssort:: [(Char, Int)] -> [(Char, Int)]
 myssort [] = []
@@ -79,7 +79,15 @@ myssort a = m : myssort (Data.List.delete m a)
 
 nMin :: [(Char, Int)] -> (Char, Int) 
 nMin [x] = x
-nMin (x:xs) = if snd x <= snd (nMin xs) then x else nMin xs
+nMin (x:xs) = if fst x <= fst (nMin xs) then x else nMin xs
+
+ninsert:: (Char, Int) -> [(Char, Int)] -> [(Char, Int)]
+ninsert a [] = [a]
+ninsert a (x:xs) = if snd x > snd a then a : x : xs else
+    x: ninsert a xs
+
+nisort:: Nomial -> Nomial
+nisort (a, b) = (a, reverse (foldr ninsert [] b))
 
     -- remove 0x^1
 remove0coeficients:: Polynomial -> Polynomial
