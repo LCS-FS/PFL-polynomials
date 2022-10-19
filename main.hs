@@ -8,13 +8,10 @@ type Polynomial = [Nomial]
 --[(0, [('x', 2)]), (2, [('y', 1)]), (5, [('z', 1)]), (1, [('y', 1)]), (7, [('y', 2)])]
 --[(7, [('y', 2)]), (3, [('y', 1)]), (5, [('z', 1)])]
 
---Example broken:
---derivated do exemplo normalizado
-
 -- ======================================================
 --                    String Parsing
 -- ===================================================
---ignorar espaços procurar "+"" ou "-" para separar 
+--ignorar espaços procurar "+" ou "-" para separar 
 --depois de encontrar um desses símbolos tem de aparecer o numero que é coeficiente e depois  
 
 -- ======================================================
@@ -33,8 +30,8 @@ normalize a = reverse (myisort (assort (addBeforeNormalize (map (nisort . nssort
 multiply:: Polynomial -> Polynomial ->Polynomial
 multiply a b = normalize (multiplyBefore a b)
 
-
--- need to sort alphabeticaly
+stringify:: Polynomial -> String
+stringify a = stringifyBefore (normalize a)
 
 -- ======================================================
 --                  Aux Functions
@@ -64,11 +61,8 @@ addAux a (b:bs) = if snd a == snd b then addNomial a b : bs
 
 -- ===================Multiply ==========================
 
--- [(1, [('x', 1)]), (2, [('y', 1)])] [(3, [('x', 1)]), (-4, [('y', 1)]), (5, [])]
-
 multiplyBefore:: Polynomial -> Polynomial -> Polynomial
-multiplyBefore [] b = []
-multiplyBefore (a: as) b = addBeforeNormalize (multiplyAux a b) (multiplyBefore as b)
+multiplyBefore as b = foldr (\ a -> addBeforeNormalize (multiplyAux a b)) [] as
 
 multiplyAux:: Nomial -> Polynomial -> Polynomial
 multiplyAux a = map (nMulti a)
@@ -81,8 +75,10 @@ nMultiAux as b = foldr nMultiAux2 b as
 
 nMultiAux2 :: (Char, Int) -> [(Char, Int)] -> [(Char, Int)]
 nMultiAux2 a [] = [a]
-nMultiAux2 a (b: bs) = if(fst a == fst b) then (fst a, snd a + snd b) : bs
+nMultiAux2 a (b: bs) = if fst a == fst b then (fst a, snd a + snd b) : bs
             else b: nMultiAux2 a bs
+
+
 -- ==================== Normalize =======================
 
     -- polynomial alphabetical sort
@@ -102,9 +98,6 @@ myinsert a (x:xs)
     | null (snd x) || null (snd a)              = x : myinsert a xs
     | snd (head (snd x)) > snd (head (snd a))   = a : x : xs
     | otherwise                                 = x : myinsert a xs
-
---myinsert a (x: xs) = if not (null (snd x)) && snd (head (snd x)) > snd (head (snd a)) then a : x : xs else
---    x : myinsert a xs
 
 myisort :: Polynomial -> Polynomial
 myisort = foldr myinsert []
@@ -144,3 +137,20 @@ remove0exponentsAux [] = []
 remove0exponentsAux (x:xs) = if snd x == 0 then remove0exponentsAux xs
                             else x: remove0exponentsAux xs
 
+-- ====================== Stringify =======================
+
+stringifyBefore:: Polynomial -> String
+stringifyBefore [x] = stringifyAux x
+stringifyBefore (x:xs) = if fst (head xs) >= 0 then stringifyAux x ++ " + " ++ stringifyBefore xs
+            else stringifyAux x ++ " - " ++ stringifyBefore xs
+
+stringifyAux:: Nomial -> String
+stringifyAux (a, b) = if not(null b) then show (abs a) ++ "*" ++ stringifyAuxList b
+                    else show (abs a)
+--stringifyAux (a, b) = show (abs a) ++ "*" ++ stringifyAuxList b
+
+stringifyAuxList:: [(Char, Int)] -> String
+stringifyAuxList [x] = if snd x > 1 then fst x : "^" ++ show(snd x)
+                    else [fst x] 
+stringifyAuxList (x:xs) = if snd x > 1 then fst x : "^" ++ show(snd x) ++ "*" ++ stringifyAuxList xs
+                    else fst x : "*" ++ stringifyAuxList xs
