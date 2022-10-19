@@ -88,7 +88,7 @@ nMultiAux2 a (b: bs) = if(fst a == fst b) then (fst a, snd a + snd b) : bs
     -- polynomial alphabetical sort
 aMin :: Polynomial -> Nomial
 aMin [x] = x
-aMin (x:xs) = if fst (head (snd x)) <= fst (head(snd (aMin xs))) then x else aMin xs
+aMin (x:xs) = if not (null (snd x)) && snd x < snd (aMin xs) then x else aMin xs
 
 assort:: Polynomial -> Polynomial
 assort [] = []
@@ -98,8 +98,13 @@ assort a = m : assort (Data.List.delete m a)
     --polynomial exponent sort
 myinsert :: Nomial -> Polynomial -> Polynomial
 myinsert a [] = [a]
-myinsert a (x: xs) = if snd (head (snd x)) > snd (head (snd a)) then a : x : xs else
-    x : myinsert a xs
+myinsert a (x:xs)
+    | null (snd x) || null (snd a)              = x : myinsert a xs
+    | snd (head (snd x)) > snd (head (snd a))   = a : x : xs
+    | otherwise                                 = x : myinsert a xs
+
+--myinsert a (x: xs) = if not (null (snd x)) && snd (head (snd x)) > snd (head (snd a)) then a : x : xs else
+--    x : myinsert a xs
 
 myisort :: Polynomial -> Polynomial
 myisort = foldr myinsert []
