@@ -40,7 +40,7 @@ multiply a b = normalize (multiplyBefore a b)
 -- ======================================================
 
 normalizeBefore:: Polynomial -> Polynomial
-normalizeBefore a = reverse (myisort (assort (addBeforeNormalize (map (nisort . nssort) ( remove0coeficients (map remove0exponents a))) [] )))
+normalizeBefore a = reverse (myisort (assort (addBeforeNormalize (map (nisort . nssort . addInner) ( remove0coeficients (map remove0exponents a))) [] )))
 
 -- =================== derivate ==========================
 
@@ -145,6 +145,18 @@ remove0exponentsAux:: [(Char, Int)] -> [(Char, Int)]
 remove0exponentsAux [] = []
 remove0exponentsAux (x:xs) = if snd x == 0 then remove0exponentsAux xs
                             else x: remove0exponentsAux xs
+
+addInner:: Nomial -> Nomial
+addInner (a, b) = (a, addInnerAux1 b)
+
+addInnerAux1:: [(Char, Int)] -> [(Char, Int)]
+addInnerAux1 [x] = [x]
+addInnerAux1 (x:xs) = addInnerAux2 x (addInnerAux1 xs)
+
+addInnerAux2 :: (Char, Int) -> [(Char, Int)] -> [(Char, Int)]
+addInnerAux2 a [] = [a]
+addInnerAux2 a (x:xs) = if fst a == fst x then (fst a, snd a + snd x) : xs
+                    else x: addInnerAux2 a xs
 
 -- ====================== Stringify =======================
 
