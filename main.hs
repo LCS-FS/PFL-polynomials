@@ -39,7 +39,7 @@ multiply a b = normalize (multiplyBefore a b)
 -- ======================================================
 
 -- =================== derivate ==========================
---percorro a lista ate encontrar a variavel e aplico derivate nela continuo a percorrer ate encontrar mais alguma se não encontrar então sigo
+
 derivateNomial:: Char -> Nomial -> Nomial
 derivateNomial _ (_, []) = (0,[]); --derivada de 2 em ordem a qualquer coisa é 0 (derivada sem variaveis)
 derivateNomial x (coef,[(v,ex)]) = if v == x then (coef * ex,[(v,ex-1)]) else (0,[]) --derivada com 1 variavel
@@ -48,9 +48,7 @@ derivateNomial x (coef,l) = derivateNomialAux (coef,l) x --derivada com mais do 
 derivateNomialAux:: Nomial -> Char -> Nomial
 derivateNomialAux (coef,[(v,ex)]) x = if v == x then (coef * ex,[(v,ex-1)]) else (0,[]) 
 derivateNomialAux (coef, (a:as) ) x = if (fst a) == x then (coef*(snd a), (fst a, (snd a)-1 ) : as) 
-                                      else (fst (derivateNomialAux (coef, as) x), a : snd (derivateNomialAux (coef, as) x))
-                                     
-
+                                      else (fst (derivateNomialAux (coef, as) x), a : snd (derivateNomialAux (coef, as) x))                              
 
 -- ======================= add ==========================
 
