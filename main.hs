@@ -18,8 +18,8 @@ type Polynomial = [Nomial]
 --                  Main Functions
 -- ======================================================
 
-add:: Polynomial -> Polynomial -> Polynomial
-add a b = normalize (addBeforeNormalize a b)
+add:: Polynomial -> Polynomial -> String
+add a b =stringify  (normalize (addBeforeNormalize a b))
 
 normalize:: Polynomial -> Polynomial
 normalize a = reverse (myisort (assort (addBeforeNormalize (map (nisort . nssort) ( remove0coeficients (map remove0exponents a))) [] ))) --not working
@@ -27,11 +27,14 @@ normalize a = reverse (myisort (assort (addBeforeNormalize (map (nisort . nssort
 --derivate:: Polynomial -> Char -> Polynomial --pedir para derivar em ordem a x
 --derivate a x = map derivateNomial normalize(a) x
 
-multiply:: Polynomial -> Polynomial ->Polynomial
-multiply a b = normalize (multiplyBefore a b)
+multiply:: Polynomial -> Polynomial -> String
+multiply a b = stringify (normalize (multiplyBefore a b))
 
 stringify:: Polynomial -> String
-stringify a = stringifyBefore (normalize a)
+stringify [x] = stringifyAux x
+stringify (x:xs) = if fst (head xs) >= 0 then stringifyAux x ++ " + " ++ stringify xs
+            else stringifyAux x ++ " - " ++ stringify xs
+--stringify (x:xs) = stringifyAux x ++ " "
 
 -- ======================================================
 --                  Aux Functions
@@ -138,11 +141,6 @@ remove0exponentsAux (x:xs) = if snd x == 0 then remove0exponentsAux xs
                             else x: remove0exponentsAux xs
 
 -- ====================== Stringify =======================
-
-stringifyBefore:: Polynomial -> String
-stringifyBefore [x] = stringifyAux x
-stringifyBefore (x:xs) = if fst (head xs) >= 0 then stringifyAux x ++ " + " ++ stringifyBefore xs
-            else stringifyAux x ++ " - " ++ stringifyBefore xs
 
 stringifyAux:: Nomial -> String
 stringifyAux (a, b) = if not(null b) then show (abs a) ++ "*" ++ stringifyAuxList b
