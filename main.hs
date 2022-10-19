@@ -1,5 +1,6 @@
 import Data.List
 import Data.String
+import Data.Char
 
 type Nomial = (Int, [(Char, Int)])
 type Polynomial = [Nomial]
@@ -7,9 +8,6 @@ type Polynomial = [Nomial]
 --Example:
 --[(0, [('x', 2)]), (2, [('y', 1)]), (5, [('z', 1)]), (1, [('y', 1)]), (7, [('y', 2)])]
 --[(7, [('y', 2)]), (3, [('y', 1)]), (5, [('z', 1)])]
-
---Example broken:
---derivated do exemplo normalizado
 
 -- ======================================================
 --                    String Parsing
@@ -25,10 +23,10 @@ add:: Polynomial -> Polynomial -> Polynomial
 add a b = normalize (addBeforeNormalize a b)
 
 normalize:: Polynomial -> Polynomial
-normalize a = reverse (myisort (assort (addBeforeNormalize (map (nisort . nssort) ( remove0coeficients (map remove0exponents a))) [] ))) --not working
+normalize a = reverse (myisort (assort (addBeforeNormalize (map (nisort . nssort) ( remove0coeficients (map remove0exponents a))) [] )))
 
---derivate:: Polynomial -> Char -> Polynomial --pedir para derivar em ordem a x
---derivate a x = map derivateNomial normalize(a) x
+derivate:: Polynomial -> Char -> Polynomial
+derivate a x = normalize (map (derivateNomial x) (normalize a))
 
 multiply:: Polynomial -> Polynomial ->Polynomial
 multiply a b = normalize (multiplyBefore a b)
@@ -41,12 +39,18 @@ multiply a b = normalize (multiplyBefore a b)
 -- ======================================================
 
 -- =================== derivate ==========================
---normalizo primeiro e depois calculo  --percorro a lista ate encontrar a variavel pedida e depois aplico aí o derivate nomial para essa e junto o resto
---derivateNomial:: Nomial -> Char -> Nomial --derivar com apenas uma variavel (para fazer com varias variaveis tinhamos de perguntar em ordem a x,y,z...)  
---derivateNomial (_, []) _ = (0,[]); --derivada de 2 em ordem a qualquer coisa é 0 (derivada sem variaveis)
---derivateNomial (coef,[(v,ex)]) x = if v == x then (coef * ex,[(v,ex-1)]) else (0,[]) --(derivada com 1 variavel) derivada de 2x^2 a x é 4x e a y é 0
---derivateNomial (coef,l) x = (coef,derivateNomialList l) --derivada com mais do que 1 variavel
---derivateNomial (coef,a:as) x = if fst a == x then addtuple ((derivateNomial (coef,[a])) (coef,as)) else (derivateNomial (coef,as) : coef,a))
+--percorro a lista ate encontrar a variavel e aplico derivate nela continuo a percorrer ate encontrar mais alguma se não encontrar então sigo
+derivateNomial:: Char -> Nomial -> Nomial
+derivateNomial _ (_, []) = (0,[]); --derivada de 2 em ordem a qualquer coisa é 0 (derivada sem variaveis)
+derivateNomial x (coef,[(v,ex)]) = if v == x then (coef * ex,[(v,ex-1)]) else (0,[]) --derivada com 1 variavel
+derivateNomial x (coef,l) = derivateNomialAux (coef,l) x --derivada com mais do que 1 variavel
+
+derivateNomialAux:: Nomial -> Char -> Nomial
+derivateNomialAux (coef,[(v,ex)]) x = if v == x then (coef * ex,[(v,ex-1)]) else (0,[]) 
+derivateNomialAux (coef, (a:as) ) x = if (fst a) == x then (coef*(snd a), (fst a, (snd a)-1 ) : as) 
+                                      else (fst (derivateNomialAux (coef, as) x), a : snd (derivateNomialAux (coef, as) x))
+                                     
+
 
 -- ======================= add ==========================
 
