@@ -6,40 +6,41 @@ type Nomial = (Int, [(Char, Int)])
 type Polynomial = [Nomial]
 
 --Example:
---[(0, [('x', 2)]), (2, [('y', 1)]), (5, [('z', 1)]), (1, [('y', 1)]), (7, [('y', 2)])]
+--[(3, [('x', 2)]), (2, [('y', 1)]), (5, [('z', 1)]), (1, [('y', 1)]), (7, [('y', 2)])]
 --[(7, [('y', 2)]), (3, [('y', 1)]), (5, [('z', 1)])]
 
 -- ======================================================
---                    String Parsing
+--                    String Functions
 -- ===================================================
---ignorar espaços procurar "+" ou "-" para separar 
---depois de encontrar um desses símbolos tem de aparecer o numero que é coeficiente e depois  
+ 
+stringify:: Polynomial -> String
+stringify [x] = stringifyAux x
+stringify (x:xs) = if fst (head xs) >= 0 then stringifyAux x ++ " + " ++ stringify xs
+            else stringifyAux x ++ " - " ++ stringify xs
 
 -- ======================================================
 --                  Main Functions
 -- ======================================================
 
 add:: Polynomial -> Polynomial -> String
-add a b =stringify  (normalize (addBeforeNormalize a b))
+add a b = stringify (addBeforeNormalize a b)
 
-normalize:: Polynomial -> Polynomial
-normalize a = reverse (myisort (assort (addBeforeNormalize (map (nisort . nssort) ( remove0coeficients (map remove0exponents a))) [] )))
+normalize:: Polynomial -> String
+normalize a = stringify (normalizeBefore a)
 
-derivate:: Polynomial -> Char -> Polynomial
-derivate a x = normalize (map (derivateNomial x) (normalize a))
+derivate:: Polynomial -> Char -> String
+derivate a x = normalize (map (derivateNomial x) (normalizeBefore a))
 
 multiply:: Polynomial -> Polynomial -> String
-multiply a b = stringify (normalize (multiplyBefore a b))
+multiply a b = normalize (multiplyBefore a b)
 
-stringify:: Polynomial -> String
-stringify [x] = stringifyAux x
-stringify (x:xs) = if fst (head xs) >= 0 then stringifyAux x ++ " + " ++ stringify xs
-            else stringifyAux x ++ " - " ++ stringify xs
---stringify (x:xs) = stringifyAux x ++ " "
 
 -- ======================================================
 --                  Aux Functions
 -- ======================================================
+
+normalizeBefore:: Polynomial -> Polynomial
+normalizeBefore a = reverse (myisort (assort (addBeforeNormalize (map (nisort . nssort) ( remove0coeficients (map remove0exponents a))) [] )))
 
 -- =================== derivate ==========================
 
