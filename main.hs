@@ -9,14 +9,18 @@ type Polynomial = [Nomial]
 --[(3, [('x', 2)]), (2, [('y', 1)]), (5, [('z', 1)]), (1, [('y', 1)]), (7, [('y', 2)])]
 --[(7, [('y', 2)]), (3, [('y', 1)]), (5, [('z', 1)])]
 
--- ======================================================
+-- ====================================================
 --                    String Functions
--- ===================================================
- 
+-- ====================================================
+
 stringify:: Polynomial -> String
+stringify [] = "0"
 stringify [x] = stringifyAux x
 stringify (x:xs) = if fst (head xs) >= 0 then stringifyAux x ++ " + " ++ stringify xs
             else stringifyAux x ++ " - " ++ stringify xs
+
+--stringparsing:: String -> Polynomial
+--stringparsing str = 
 
 -- ======================================================
 --                  Main Functions
@@ -28,8 +32,8 @@ add a b = stringify (addBeforeNormalize a b)
 normalize:: Polynomial -> String
 normalize a = stringify (normalizeBefore a)
 
-derivate:: Polynomial -> Char -> String
-derivate a x = normalize (map (derivateNomial x) (normalizeBefore a))
+derivateInOrderTo:: Polynomial -> Char -> String
+derivateInOrderTo a x = normalize (map (derivateNomial x) (normalizeBefore a))
 
 multiply:: Polynomial -> Polynomial -> String
 multiply a b = normalize (multiplyBefore a b)
@@ -42,7 +46,7 @@ multiply a b = normalize (multiplyBefore a b)
 normalizeBefore:: Polynomial -> Polynomial
 normalizeBefore a = reverse (myisort (assort (addBeforeNormalize (map (nisort . nssort . addInner) ( remove0coeficients (map remove0exponents a))) [] )))
 
--- =================== derivate ==========================
+-- =================== Derivate ==========================
 
 derivateNomial:: Char -> Nomial -> Nomial
 derivateNomial _ (_, []) = (0,[]); --derivada de 2 em ordem a qualquer coisa é 0 (derivada sem variaveis)
@@ -50,13 +54,16 @@ derivateNomial x (coef,[(v,ex)]) = if v == x then (coef * ex,[(v,ex-1)]) else (0
 derivateNomial x (coef,l) = derivateNomialAux (coef,l) x --derivada com mais do que 1 variavel
 
 derivateNomialAux:: Nomial -> Char -> Nomial
-derivateNomialAux (coef,[(v,ex)]) x = if v == x then (coef * ex,[(v,ex-1)]) else (0,[]) 
-derivateNomialAux (coef, (a:as) ) x = if (fst a) == x then (coef*(snd a), (fst a, (snd a)-1 ) : as) 
-                                      else (fst (derivateNomialAux (coef, as) x), a : snd (derivateNomialAux (coef, as) x))                              
+derivateNomialAux (coef,[(v,ex)]) x = if v == x then (coef * ex,[(v,ex-1)]) else (0,[])
+derivateNomialAux (coef, (a:as) ) x = if (fst a) == x then (coef*(snd a), (fst a, (snd a)-1 ) : as)
+                                      else (fst (derivateNomialAux (coef, as) x), a : snd (derivateNomialAux (coef, as) x))
 
 -- ======================= add ==========================
 
 addBeforeNormalize :: Polynomial -> Polynomial -> Polynomial
+addBeforeNormalize [] [] = []
+addBeforeNormalize [] b = b
+addBeforeNormalize a [] = a
 addBeforeNormalize [a] b = addAux a b
 addBeforeNormalize (a:as) b = addAux a (addBeforeNormalize as b)
 
@@ -150,6 +157,7 @@ addInner:: Nomial -> Nomial
 addInner (a, b) = (a, addInnerAux1 b)
 
 addInnerAux1:: [(Char, Int)] -> [(Char, Int)]
+addInnerAux1 [] = []
 addInnerAux1 [x] = [x]
 addInnerAux1 (x:xs) = addInnerAux2 x (addInnerAux1 xs)
 
@@ -166,7 +174,20 @@ stringifyAux (a, b) = if not(null b) then show (abs a) ++ "*" ++ stringifyAuxLis
 --stringifyAux (a, b) = show (abs a) ++ "*" ++ stringifyAuxList b
 
 stringifyAuxList:: [(Char, Int)] -> String
-stringifyAuxList [x] = if snd x > 1 then fst x : "^" ++ show(snd x)
-                    else [fst x] 
-stringifyAuxList (x:xs) = if snd x > 1 then fst x : "^" ++ show(snd x) ++ "*" ++ stringifyAuxList xs
+stringifyAuxList [x] = if snd x /= 0 then fst x : "^" ++ show(snd x)
+                    else [fst x]
+stringifyAuxList (x:xs) = if snd x /= 0 then fst x : "^" ++ show(snd x) ++ "*" ++ stringifyAuxList xs
                     else fst x : "*" ++ stringifyAuxList xs
+
+-- ====================== String Parsing =======================
+
+
+removeSpaces :: String -> String                  --remove se os espaços
+removeSpaces str = filter (\ x -> x /= ' ') str
+                                                  --coloca-se numa lista
+                                                  --ver se for '+','-' ou 'Int'
+--createNomial :: String -> (Int, [(Char, Int)])
+--createNomial str = (n, [(v, exp)])
+--                   where n = [Int(x) | \ x <- str]
+--                         v = 
+--                         exp = 
