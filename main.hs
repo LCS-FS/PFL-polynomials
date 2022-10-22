@@ -265,15 +265,15 @@ replaceMinus (x : xs) =
   if x /= '-'
     then x : replaceMinus xs
     else "+-" ++ replaceMinus xs
-    
+
 -- searches for the first variable and if it doesn't have an expoent adds and underscore to represent it
 -- if it does have a variable adds it separated by spaces
 replaceFirstLetter :: String -> String
 replaceFirstLetter [] = "* _"
-replaceFirstLetter (x : xs) =
-  if isLetter x
-    then " " ++ [x] ++ xs
-    else x : replaceFirstLetter xs
+replaceFirstLetter (x : xs) | x == '-' && isLetter (head xs)    = "-1*" ++ replaceFirstLetter xs
+                            | isLetter x                        = " " ++ [x] ++ xs
+                            | otherwise                         = x : replaceFirstLetter xs
+
 
 ---------------------------
 -- replaces "+" with an empty space (" ") so we can separate into lists after it
