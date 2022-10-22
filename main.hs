@@ -21,7 +21,7 @@ stringify (x : xs) =
 
 -- converts a string into a polynomial
 stringParsing:: String -> Polynomial
-stringParsing str = map (parseNomial . (separate . replaceFirstLetter)) (separate (replaceMinus (removeSpaces str)))
+stringParsing str = map (parseNomial . (separate . replaceFirstLetter)) (separate (replace '-' "+-" (removeSpaces str)))
 
 -- ======================================================
 --                  Main Functions
@@ -256,15 +256,7 @@ stringifyAuxList (x:xs) | snd x > 1  = '*' : fst x : "^" ++ show (snd x) ++ stri
 
 --removes useless spaces (" ") from the string
 removeSpaces :: String -> String 
-removeSpaces str = filter (\x -> x /= ' ') str
-
--- replaces every minus ("-") with "+-", to simplify spliting of the polynomial with negative coeficients
-replaceMinus :: String -> String
-replaceMinus [] = []
-replaceMinus (x : xs) =
-  if x /= '-'
-    then x : replaceMinus xs
-    else "+-" ++ replaceMinus xs
+removeSpaces = filter (/= ' ') 
 
 -- searches for the first variable and if it doesn't have an expoent adds and underscore to represent it
 -- if it does have a variable adds it separated by spaces
@@ -274,32 +266,13 @@ replaceFirstLetter (x : xs) | x == '-' && isLetter (head xs)    = "-1*" ++ repla
                             | isLetter x                        = " " ++ [x] ++ xs
                             | otherwise                         = x : replaceFirstLetter xs
 
-
----------------------------
--- replaces "+" with an empty space (" ") so we can separate into lists after it
-replacePlus :: String -> String
-replacePlus [] = []
-replacePlus (x : xs) =
-  if x /= '+'
-    then x : replacePlus xs
-    else " " ++ replacePlus xs
-
--- replaces "*" with an empty space (" ") so we can separate into lists after it
-replaceAsterics :: String -> String
-replaceAsterics [] = []
-replaceAsterics (x : xs) =
-  if x /= '*'
-    then x : replaceAsterics xs
-    else " " ++ replaceAsterics xs
-
--- replaces "^" with an empty space (" ") so we can separate into lists after it
-replacePotency :: String -> String
-replacePotency [] = []
-replacePotency (x : xs) =
-  if x /= '^'
-    then x : replacePotency xs
-    else " " ++ replacePotency xs
-----------------------
+-- replaces the delimitor char with the replacement string in the string so we can separate into lists after it
+replace:: Char -> String -> String -> String
+replace _ _ [] = []
+replace del rep (x:xs) = 
+  if x /= del
+    then x : replace del rep xs
+    else rep ++ replace del rep xs
 
 -- if last element of the string is not a digit (which means it is a variable) adds the expoent '1' to it 
 addPotency :: String -> String
@@ -308,7 +281,7 @@ addPotency str = if isDigit (last str) then str
 
 --splits the string into a list of strings on the "+" character
 separate :: String -> [String]
-separate str = words (replacePlus str)
+separate str = words (replace '+' " " str)
 
 -- auxiliary function to convert a string with a number into a Integer
 readAux :: String -> Int
@@ -324,7 +297,7 @@ parseNomial [a, b] = (parseCoeficient a, parseVariables b)
 -- if the coeficient is a multiplication like "2*3" it also multiplies them
 parseCoeficient :: String -> Int
 parseCoeficient "" = 1
-parseCoeficient str = product (map readAux (words (replaceAsterics (init str))))
+parseCoeficient str = product (map readAux (words (replace '*' " " (init str))))
 
 -- parses the string that represents the variables into a list of (variable, exponent) tuples
 -- first splits the string by the '*' char
@@ -332,7 +305,7 @@ parseCoeficient str = product (map readAux (words (replaceAsterics (init str))))
 -- calls auxiliary function variablesAux to turn [variable, exponent] list of strings to (variable, exponent tuple)
 parseVariables :: String -> [(Char, Int)]
 parseVariables "_" = []
-parseVariables str = map ((variablesAux . words) . replacePotency . addPotency) (words (replaceAsterics str))
+parseVariables str = map ((variablesAux . words) . replace '^' " " . addPotency) (words (replace '*' " " str))
 
 -- auxiliary function that turns [variable, exponent] list of strings to (variable, exponent tuple)
 variablesAux :: [String] -> (Char, Int)
