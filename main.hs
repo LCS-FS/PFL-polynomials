@@ -232,6 +232,10 @@ addInnerAux2 a (x : xs) =
 -- auxiliary funtion that handles the convertion of the coeficient of the monomial to string
 -- calls an auxiliary function to handle the convertion of the list of (variable, exponent) tuples to string
 stringifyAux :: Nomial -> String
+stringifyAux (-1,b) =
+  if not (null b)
+    then tail (stringifyAuxList b)
+    else ""
 stringifyAux (1,b) =
   if not (null b)
     then tail (stringifyAuxList b)
