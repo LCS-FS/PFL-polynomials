@@ -8,8 +8,6 @@
 - De forma a podermos representar monómios do tipo `2*x^2*y^3` em vez de termos uma estrutura do tipo `(Char, Int)` para as variáveis e os seus expoentes, representámos essa estrutura como uma lista de pares `[(Char, Int)]` para podermos representar múltiplas variáveis juntas dos seus expoentes associados.
 - Os polinómios (`Polynomial`) são um conjunto de monómios somados uns aos outros pelo que escolhemos representá-los pelo tipo `[Nomial]`, uma lista de monómios.
 
-<br>
-
 # Funcionalidades
 Todas as funções principais entregam resultados na forma normalizada e no formato de `String`. E além disso, todas as funções principais recebem argumentos do tipo `String` que são convertidos para o tipo `Polynomial` para poderem ser afetuadas as operações.
 
@@ -80,6 +78,12 @@ Alguns exemplos de utilização mais complexos que utilizam todas as capacidades
     Tipo: multiply :: String -> String -> String
     Input: multiply "2*y^2 + 4*y*x^2 + 3*z" "0*x^2 - 9*y + 3*z + y - 3*y^2"
     Resultado: "-6*y^4 - 16*y^3 - 12*y^3*x^2 + 12*x^2*y*z - 32*x^2*y^2 - 3*y^2*z + 9*z^2 - 24*y*z"
+
+<br>
+<br>
+<br>
+<br>
+
 
 ### Derivar:
     Tipo: derivateInOrderTo :: String -> Char -> String
