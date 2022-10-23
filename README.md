@@ -24,7 +24,7 @@ Todas as funções principais entregam resultados na forma normalizada e no form
 ## Derivar polinómios em ordem a uma variável
 - Para a derivação, implementámos derivação de polinómios em ordem a uma variável à escolha através da função `derivateInOrderTo`. Esta função, recebe como argumentos um polinómio (`String`), e um `Char` que representa a variável pela qual o queremos derivar, e através de funções auxiliares deriva monómio a monómio recursivamente. 
 - Por exemplo, derivando um monómio com apenas uma variável em ordem a `x`, caso o monómio não tenha a variável `x` será 0, se tiver a variável então multiplica-se o coeficiente pelo expoente e subtrai-se o expoente em 1. 
-- Caso tenha mais do que uma variável, temos de ver recursivamente as variáveis com outro caso base. Se a variável analisada for do tipo 'x' multiplica-se o coeficiente e subtrai-se ao expoente novamente, mas se não for, em vez de ficar as variáveis e expoentes ficarem a 0, a variável e expoente ficam iguais e continua-se a percorrer o monómio recursivamente para as restantes variáveis. 
+- Caso tenha mais do que uma variável, temos de ver recursivamente as variáveis com outro caso base. Se a variável analisada for do tipo `x` multiplica-se o coeficiente e subtrai-se ao expoente novamente, mas se não for, em vez de ficar as variáveis e expoentes ficarem a 0, a variável e expoente ficam iguais e continua-se a percorrer o monómio recursivamente para as restantes variáveis. 
 
 ## Normalizar polinómios para a forma normal
   A função `normalize` recebe um polinómio e retorna-o, em string, na forma mormal. Para tal, realiza algumas operações, em ordem, com o uso de funções auxiliares:
@@ -67,26 +67,28 @@ Para converter a string de input para polinómio usámos a função `stringParsi
 Todos os inputs necessitam de ter coeficientes e variáveis separados por `*`.<br>
 As variáveis e coeficientes necessitam de ser separadas por `^`.<br>
 As variáveis têm de ser do tipo `Char` e os coeficientes do tipo `Int`.<br>
-Coeficientes podem ser positivos e negativos. Expoentes têm de ser positivos.
+Coeficientes podem ser positivos e negativos. Expoentes têm de ser positivos. <br>
+<br>
+Alguns exemplos de utilização mais complexos que utilizam todas as capacidades das funcionalidades implementadas são os seguintes:
 
 ### Adicionar:
-    add :: String -> String -> String
-    add "7*y^2 + 3*y*x + 5*z" "0*x^2 - 2*y + 5*z + y - 3*y^2"
+    Tipo: add :: String -> String -> String
+    Input: add "7*y^2 + 3*y*x + 5*z" "0*x^2 - 2*y + 5*z + y - 3*y^2"
     Resultado: "4*y^2 + 3*x*y - y + 10*z"
 
 ### Multiplicar:
-    multiply :: String -> String -> String
-    multiply "2*y^2 + 4*y*x^2 + 3*z" "0*x^2 - 9*y + 3*z + y - 3*y^2"
+    Tipo: multiply :: String -> String -> String
+    Input: multiply "2*y^2 + 4*y*x^2 + 3*z" "0*x^2 - 9*y + 3*z + y - 3*y^2"
     Resultado: "-6*y^4 - 16*y^3 - 12*y^3*x^2 + 12*x^2*y*z - 32*x^2*y^2 - 3*y^2*z + 9*z^2 - 24*y*z"
 
 ### Derivar:
-    derivateInOrderTo :: String -> Char -> String
-    derivateInOrderTo  "-6*y^4 - 16*y^3 - 12*y^3*x^2 + 12*x^2*y*z - 32*x^2*y^2 - 3*y^2*z + 9*z^2 - 24*y*z" 'x'
+    Tipo: derivateInOrderTo :: String -> Char -> String
+    Input: derivateInOrderTo  "-6*y^4 - 16*y^3 - 12*y^3*x^2 + 12*x^2*y*z - 32*x^2*y^2 - 3*y^2*z + 9*z^2 - 24*y*z" 'x'
     Resultado: "-24*y^3*x - 64*y^2*x + 24*x*y*z"
 
 ### Normalizar:
-    normalize :: String -> String
-    normalize "0*x -3*x + 2*z^3*x^2 -2*x - 3*y^2"
+    Tipo: normalize :: String -> String
+    Input: normalize "0*x -3*x + 2*z^3*x^2 -2*x - 3*y^2"
     Resultado: "2*z^3*x^2 - 3*y^2 - 5*x"
 
 ## Membros:
