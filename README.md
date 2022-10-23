@@ -84,6 +84,10 @@ As variáveis e coeficientes necessitam de ser separadas por `^`.
     derivateInOrderTo  "-6*y^4 - 16*y^3 - 12*y^3*x^2 + 12*x^2*y*z - 32*x^2*y^2 - 3*y^2*z + 9*z^2 - 24*y*z" 'x'
     Resultado: "-24*y^3*x - 64*y^2*x + 24*x*y*z"
 
+### Normalizar:
+    normalize :: String -> String
+    normalize "0*x -3*x + 2*z^3*x^2 -2*x - 3*y^2"
+    Resultado: "2*z^3*x^2 - 3*y^2 - 5*x"
 
 ## Membros:
 - André Morais  - up202005303
