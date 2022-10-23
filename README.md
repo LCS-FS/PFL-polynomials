@@ -23,7 +23,7 @@ Todas as funções principais entregam resultados na forma normalizada e no form
 
 ## Derivar polinómios em ordem a uma variável
 - Para a derivação, implementámos derivação de polinómios em ordem a uma variável à escolha através da função `derivateInOrderTo`. Esta função, recebe como argumentos um polinómio (`String`), e um `Char` que representa a variável pela qual o queremos derivar, e através de funções auxiliares deriva monómio a monómio recursivamente. 
-- Por exemplo, derivando um monómio com apenas uma variável em ordem a 'x', caso o monómio não tenha a variável 'x' será 0, se tiver a variável então multiplica-se o coeficiente pelo expoente e subtrai-se o expoente em 1. 
+- Por exemplo, derivando um monómio com apenas uma variável em ordem a `x`, caso o monómio não tenha a variável `x` será 0, se tiver a variável então multiplica-se o coeficiente pelo expoente e subtrai-se o expoente em 1. 
 - Caso tenha mais do que uma variável, temos de ver recursivamente as variáveis com outro caso base. Se a variável analisada for do tipo 'x' multiplica-se o coeficiente e subtrai-se ao expoente novamente, mas se não for, em vez de ficar as variáveis e expoentes ficarem a 0, a variável e expoente ficam iguais e continua-se a percorrer o monómio recursivamente para as restantes variáveis. 
 
 ## Normalizar polinómios para a forma normal
@@ -38,7 +38,7 @@ Todas as funções principais entregam resultados na forma normalizada e no form
   7. Ordena os monómios alfabeticamente, em relação à primeira variável, com selection sort.
   8. Ordena os monómios, em relação ao expoente da primeira variável, com insertion sort.
    
-   No final, o polinómio resultante é retornado no formato de String. 
+   No final, o polinómio resultante é retornado no formato de `String`. 
    
 
 ## Passar output para string
@@ -65,9 +65,9 @@ Para converter a string de input para polinómio usámos a função `stringParsi
 
 # Exemplos de utilização:
 Todos os inputs necessitam de ter coeficientes e variáveis separados por `*`.<br>
-As variáveis e coeficientes necessitam de ser separadas por `^`.
-
- 
+As variáveis e coeficientes necessitam de ser separadas por `^`.<br>
+As variáveis têm de ser do tipo `Char` e os coeficientes do tipo `Int`.<br>
+Coeficientes podem ser positivos e negativos. Expoentes têm de ser positivos.
 
 ### Adicionar:
     add :: String -> String -> String
