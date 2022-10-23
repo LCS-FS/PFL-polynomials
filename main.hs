@@ -12,6 +12,7 @@ type Polynomial = [Nomial]
 
 -- adds "-" to string if first element is negative
 stringify :: Polynomial -> String
+stringify [] = "0"
 stringify list = if fst (head list) < 0 then "-" ++ stringifyTail list
               else stringifyTail list
 
@@ -110,6 +111,8 @@ addAux a (b : bs) =
 
 -- multiplies every monomial of the first polynomial with the second polynomial, with the aid of the auxiliary function multiplyAux
 multiplyBefore :: Polynomial -> Polynomial -> Polynomial
+multiplyBefore _ [] = []
+multiplyBefore [] _ = []
 multiplyBefore as b = foldr (\a -> addBeforeNormalize (multiplyAux a b)) [] as
 
 -- multiplies the monomial with all monomials of the polynomial, with the aid of the auxiliary function nMulti
