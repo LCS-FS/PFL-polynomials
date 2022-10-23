@@ -10,14 +10,19 @@ type Polynomial = [Nomial]
 --                    String Functions
 -- ====================================================
 
--- converts a polynomial into a string
+-- adds "-" to string if first element is negative
 stringify :: Polynomial -> String
-stringify [] = "0"
-stringify [x] = stringifyAux x
-stringify (x : xs) =
+stringify list = if fst (head list) < 0 then "-" ++ stringifyTail list
+              else stringifyTail list
+
+-- converts a polynomial into a string
+stringifyTail :: Polynomial -> String
+stringifyTail [] = "0"
+stringifyTail [x] = stringifyAux x
+stringifyTail (x : xs) =
   if fst (head xs) >= 0
-    then stringifyAux x ++ " + " ++ stringify xs
-    else stringifyAux x ++ " - " ++ stringify xs
+    then stringifyAux x ++ " + " ++ stringifyTail xs
+    else stringifyAux x ++ " - " ++ stringifyTail xs
 
 -- converts a string into a polynomial
 stringParsing:: String -> Polynomial
@@ -31,7 +36,7 @@ stringParsing str = map (parseNomial . (separate . replaceFirstLetter)) (separat
 -- it parses the strings into polynomial types before adding them
 -- normalizes the result and returns it as a string 
 add :: String -> String -> String
-add a b = stringify (normalizeBefore (addBeforeNormalize (stringParsing a) (stringParsing b)))
+add a b = stringify (normalizeBefore (addBeforeNormalize (normalizeBefore (stringParsing a)) (normalizeBefore (stringParsing b))))
 
 -- function to normalize any polynomial (represented by a string)
 -- it parses the string a into polynomial type before normalizing the output into a string
@@ -47,7 +52,9 @@ derivateInOrderTo a x = stringify (normalizeBefore (map (derivateNomial x) (norm
 -- it parses the strings into polynomial types before multiplying them
 -- normalizes the result and returns it as a string 
 multiply :: String -> String -> String
-multiply a b = stringify (normalizeBefore (multiplyBefore (stringParsing a) (stringParsing b)))
+multiply a b = stringify (normalizeBefore (multiplyBefore (normalizeBefore (stringParsing a)) (normalizeBefore (stringParsing b))))
+
+
 
 -- ======================================================
 --                  Aux Functions
@@ -73,7 +80,7 @@ derivateNomialAux :: Nomial -> Char -> Nomial
 derivateNomialAux (coef, [(v, ex)]) x = if v == x then (coef * ex, [(v, ex - 1)]) else (0, []) --base case
 derivateNomialAux (coef, (a : as)) x =
   if (fst a) == x
-    then (coef * (snd a), (fst a, (snd a) - 1) : as)  --found variable to derivate
+    then (coef * snd a, (fst a, (snd a) - 1) : as)  --found variable to derivate
     else (fst (derivateNomialAux (coef, as) x), a : snd (derivateNomialAux (coef, as) x)) --hasn't found variable to derivate yet, continues recursively
 
 -- ==================== add =====================
@@ -170,12 +177,12 @@ myssort a = m : myssort (delete m a)
   where
     m = nMin a
 
---returns the lowest (variable, exponent) tuple, alphabeticaly by the variable
+--returns the lowest (variable, exponent) pair, alphabeticaly by the variable
 nMin :: [(Char, Int)] -> (Char, Int)
 nMin [x] = x
 nMin (x : xs) = if fst x <= fst (nMin xs) then x else nMin xs
 
--- inserts a (variable, exponent) tuple in the list of variables in order of its exponent
+-- inserts a (variable, exponent) pair in the list of variables in order of its exponent
 ninsert :: (Char, Int) -> [(Char, Int)] -> [(Char, Int)]
 ninsert a [] = [a]
 ninsert a (x : xs) =
@@ -199,7 +206,7 @@ remove0coeficients (x : xs) =
 remove0exponents :: Nomial -> Nomial
 remove0exponents (a, x) = (a, remove0exponentsAux x)
 
--- auxiliary funtion that looks for (variable , 0) tuples and removes them
+-- auxiliary funtion that looks for (variable , 0) pairs and removes them
 remove0exponentsAux :: [(Char, Int)] -> [(Char, Int)]
 remove0exponentsAux [] = []
 remove0exponentsAux (x : xs) =
@@ -207,19 +214,19 @@ remove0exponentsAux (x : xs) =
     then remove0exponentsAux xs
     else x : remove0exponentsAux xs
 
--- adds (variable, exponent) tuples with the same variable in a monomial, with the aid of an auxiliary function
+-- adds (variable, exponent) pairs with the same variable in a monomial, with the aid of an auxiliary function
 addInner :: Nomial -> Nomial
 addInner (a, b) = (a, addInnerAux1 b)
 
--- tries to add every  (variable, exponent) tuple to the rest of the list 
+-- tries to add every  (variable, exponent) pair to the rest of the list 
 addInnerAux1 :: [(Char, Int)] -> [(Char, Int)]
 addInnerAux1 [] = []
 addInnerAux1 [x] = [x]
 addInnerAux1 (x : xs) = addInnerAux2 x (addInnerAux1 xs)
 
--- adds a (variable, exponent) tuple to the list
--- if it finds a tuple in the list with the same variable, it adds their exponents
--- otherwise keeps recursively searching until it reaches the end of the list, where it appends the tuple
+-- adds a (variable, exponent) pair to the list
+-- if it finds a pair in the list with the same variable, it adds their exponents
+-- otherwise keeps recursively searching until it reaches the end of the list, where it appends the pair
 addInnerAux2 :: (Char, Int) -> [(Char, Int)] -> [(Char, Int)]
 addInnerAux2 a [] = [a]
 addInnerAux2 a (x : xs) =
@@ -230,26 +237,18 @@ addInnerAux2 a (x : xs) =
 -- ====================== Stringify =======================
 
 -- auxiliary funtion that handles the convertion of the coeficient of the monomial to string
--- calls an auxiliary function to handle the convertion of the list of (variable, exponent) tuples to string
+-- calls an auxiliary function to handle the convertion of the list of (variable, exponent) pairs to string
 stringifyAux :: Nomial -> String
-stringifyAux (-1,b) =
-  if not (null b)
-    then tail (stringifyAuxList b)
-    else ""
-stringifyAux (1,b) =
-  if not (null b)
-    then tail (stringifyAuxList b)
-    else ""
-stringifyAux (a, b) =
-  if not (null b)
-    then show (abs a) ++ stringifyAuxList b
-    else show (abs a)
+stringifyAux (a, b) | (a == -1 || a == 1) && not (null b)   = tail (stringifyAuxList b)
+                    | (a == -1 || a == 1) && null b         = show a
+                    | not (null b)        = show (abs a) ++ stringifyAuxList b
+                    | otherwise           = show (abs a)
 
 -- aux function that receives the variables and expoents and turns it into a string
 -- considering if it doesn't have an expoent, it is 1, or more than 1
 stringifyAuxList :: [(Char, Int)] -> String
 stringifyAuxList [x] | snd x > 1     = '*' : fst x : "^" ++ show (snd x)
-                     | snd x == 1    = '*' : [fst x]  
+                     | snd x == 1    = '*' : [fst x]
                      | otherwise     = ""
 stringifyAuxList (x:xs) | snd x > 1  = '*' : fst x : "^" ++ show (snd x) ++ stringifyAuxList xs
                         | snd x == 1 = '*' : fst x  : stringifyAuxList xs
@@ -259,11 +258,11 @@ stringifyAuxList (x:xs) | snd x > 1  = '*' : fst x : "^" ++ show (snd x) ++ stri
 -- ====================== String Parsing =======================
 
 --removes useless spaces (" ") from the string
-removeSpaces :: String -> String 
-removeSpaces = filter (/= ' ') 
+removeSpaces :: String -> String
+removeSpaces = filter (/= ' ')
 
 -- searches for the first variable and if it doesn't have an expoent adds and underscore to represent it
--- if it does have a variable adds it separated by spaces
+-- if it does have a variable it is separated from the coeficient by a space
 replaceFirstLetter :: String -> String
 replaceFirstLetter [] = "* _"
 replaceFirstLetter (x : xs) | x == '-' && isLetter (head xs)    = "-1*" ++ replaceFirstLetter xs
@@ -273,7 +272,7 @@ replaceFirstLetter (x : xs) | x == '-' && isLetter (head xs)    = "-1*" ++ repla
 -- replaces the delimitor char with the replacement string in the string so we can separate into lists after it
 replace:: Char -> String -> String -> String
 replace _ _ [] = []
-replace del rep (x:xs) = 
+replace del rep (x:xs) =
   if x /= del
     then x : replace del rep xs
     else rep ++ replace del rep xs
@@ -303,14 +302,14 @@ parseCoeficient :: String -> Int
 parseCoeficient "" = 1
 parseCoeficient str = product (map readAux (words (replace '*' " " (init str))))
 
--- parses the string that represents the variables into a list of (variable, exponent) tuples
+-- parses the string that represents the variables into a list of (variable, exponent) pairs
 -- first splits the string by the '*' char
 -- then calls auxiliary functions to simplify parsing of exponents
--- calls auxiliary function variablesAux to turn [variable, exponent] list of strings to (variable, exponent tuple)
+-- calls auxiliary function variablesAux to turn [variable, exponent] list of strings to (variable, exponent pair)
 parseVariables :: String -> [(Char, Int)]
 parseVariables "_" = []
 parseVariables str = map ((variablesAux . words) . replace '^' " " . addPotency) (words (replace '*' " " str))
 
--- auxiliary function that turns [variable, exponent] list of strings to (variable, exponent tuple)
+-- auxiliary function that turns [variable, exponent] list of strings to (variable, exponent pair)
 variablesAux :: [String] -> (Char, Int)
 variablesAux list = (head (head list), readAux (last list))
